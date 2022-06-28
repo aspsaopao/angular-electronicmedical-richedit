@@ -1,0 +1,12 @@
+.form-control {
+  float: left;
+  width: 70%;
+}
+
+.btn btn-default {
+  background-color: #41abe9;
+}
+
+#eleedit {
+  padding: 10px;
+}

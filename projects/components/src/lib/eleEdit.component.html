@@ -1,8 +1,37 @@
-<div>
-  <div>
-    电子病历
-    <button nz-button nzType="primary">哈哈哈</button>
-  </div>
+<div id="eleedit">
+  <div nz-row>
+    <div nz-col nzSpan="8">
+      <button nz-button nzType="primary" (click)="add()">追加字1段</button>
+      <button nz-button nzType="primary">显示文字</button>
+      <button nz-button nzType="primary">显示绑定代码</button>
+      <nz-tabset>
+        <nz-tab nzTitle="要素">
 
-  <div id="RichEdit"></div>
+          <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
+            <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodeIndentLine>
+              <nz-tree-node-toggle nzTreeNodeNoopToggle *ngIf="showLeafIcon">
+              </nz-tree-node-toggle>
+              <nz-tree-node-option>
+                {{ node.name }}
+              </nz-tree-node-option>
+            </nz-tree-node>
+
+            <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodeIndentLine>
+              <nz-tree-node-toggle>
+              </nz-tree-node-toggle>
+              <nz-tree-node-option>
+                {{ node.name }}
+              </nz-tree-node-option>
+            </nz-tree-node>
+          </nz-tree-view>
+
+        </nz-tab>
+        <nz-tab nzTitle="患者病历">Content of Tab Pane 2</nz-tab>
+        <nz-tab nzTitle="范文">Content of Tab Pane 3</nz-tab>
+      </nz-tabset>
+    </div>
+    <div nz-col nzSpan="16">
+      <div id="RichEdit"></div>
+    </div>
+  </div>
 </div>

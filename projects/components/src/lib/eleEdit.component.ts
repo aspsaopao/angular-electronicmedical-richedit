@@ -5,6 +5,7 @@ import {
   Output,
   EventEmitter,
   ElementRef,
+  AfterViewInit,
 } from '@angular/core';
 import {
   create,
@@ -22,37 +23,57 @@ import {
   SavingEventArgs,
   ViewType,
 } from 'devexpress-richedit';
+import { SelectionModel } from '@angular/cdk/collections';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
+
+interface FlatNode {
+  expandable: boolean;
+  name: string;
+  level: number;
+}
 
 export interface OptionsEx {
   /**
    * 文件信息
    */
-  documentBase64: string;
+  documentBase64?: string;
   /**
    * 宽度
    */
-  width: string;
+  width?: string;
   /**
    * 高度
    */
-  height: string;
+  height?: string;
   /**
    *左边要素目录
    * */
-  elementList: ElementItem[];
+  elementList?: ElementItem[];
   /**
    *患者历史病历列表
    * */
-  patientMedicalList:PMItem[]
+  patientMedicalList?: PMItem[];
+  /**
+   *是否显示代码
+   * */
+  isShowCode?: boolean | false;
+  /**
+   * 模板对应的患者病历字段
+   * */
+  richEditValueData?: EditValueItem[];
+}
+export interface EditValueItem {
+  id: string;
+  value: string;
 }
 
 export interface ElementItem {
-
-  id: string;
+  id?: string;
 
   name: string;
 
-  parentId: string
+  children?: ElementItem[];
 }
 
 export interface PMItem {
@@ -64,24 +85,22 @@ export interface PMItem {
 }
 
 @Component({
-  selector: 'zt-eleEdit',
+  selector: 'ng-ele-richEdit',
   templateUrl: './eleEdit.component.html',
-  styles: [],
+  styleUrls: ['./eleEdit.component.css'],
 })
 export class EleEditComponent implements OnInit {
   /**
    * 配置信息
    */
-  @Input() editOption: OptionsEx=null;
+  @Input() editOption: OptionsEx = null;
   /**
    * 文件保存事件传出
    */
   @Output() onSave = new EventEmitter<RichEdit>();
   @Output() onSaving = new EventEmitter<RichEdit>();
 
-  constructor(private element: ElementRef) {}
-
-  ngOnInit() {}
+  ngOnInit() { }
 
   query(info: string) {
     this.onSave.emit(null);
@@ -112,30 +131,37 @@ export class EleEditComponent implements OnInit {
     // ];
 
     // events
-    options.events.activeSubDocumentChanged = () => {};
-    options.events.autoCorrect = () => {};
-    options.events.calculateDocumentVariable = () => {};
-    options.events.characterPropertiesChanged = () => {};
-    options.events.contentInserted = () => {};
-    options.events.contentRemoved = () => {};
-    options.events.documentChanged = () => {};
-    options.events.documentFormatted = () => {};
-    options.events.documentLoaded = () => {};
-    options.events.gotFocus = () => {};
-    options.events.hyperlinkClick = () => {};
-    options.events.keyDown = () => {};
-    options.events.keyUp = () => {};
-    options.events.paragraphPropertiesChanged = () => {};
-    options.events.lostFocus = () => {};
-    options.events.pointerDown = () => {};
-    options.events.pointerUp = () => {};
+    options.events.activeSubDocumentChanged = () => { };
+    options.events.autoCorrect = () => { };
+    options.events.calculateDocumentVariable = (a, b) => {
+      if (!this.editOption.isShowCode) {
+        let value =
+          this.editOption.richEditValueData.find((t) => t.id === b.args[0])
+            ?.value ?? '';
+        b.value = value;
+      }
+    };
+    options.events.characterPropertiesChanged = () => { };
+    options.events.contentInserted = () => { };
+    options.events.contentRemoved = () => { };
+    options.events.documentChanged = () => { };
+    options.events.documentFormatted = () => { };
+    options.events.documentLoaded = () => { };
+    options.events.gotFocus = () => { };
+    options.events.hyperlinkClick = () => { };
+    options.events.keyDown = () => { };
+    options.events.keyUp = () => { };
+    options.events.paragraphPropertiesChanged = () => { };
+    options.events.lostFocus = () => { };
+    options.events.pointerDown = () => { };
+    options.events.pointerUp = () => { };
     options.events.saving = (s: RichEdit) => {
       this.onSave.emit(s);
     };
     options.events.saved = (s: RichEdit) => {
       this.onSaving.emit(s);
     };
-    options.events.selectionChanged = () => {};
+    options.events.selectionChanged = () => { };
     options.events.customCommandExecuted = (s, e) => {
       switch (e.commandName) {
         case 'insertEmailSignature':
@@ -198,9 +224,6 @@ export class EleEditComponent implements OnInit {
         }
       }
     };
-
-    options.exportUrl = 'https://siteurl.com/api/';
-
     options.readOnly = false;
     options.width = this.editOption.width;
     options.height = this.editOption.height;
@@ -211,6 +234,9 @@ export class EleEditComponent implements OnInit {
       'DocumentName',
       DocumentFormat.Rtf
     );
+    this.dataSource.setData(this.editOption.elementList);
+
+    this.treeControl.expandAll();
   }
 
   ngOnDestroy() {
@@ -218,5 +244,48 @@ export class EleEditComponent implements OnInit {
       this.rich.dispose();
       this.rich = null;
     }
+  }
+  tabs = ['Tab 1', 'Tab 2'];
+  selectedIndex = 0;
+
+  closeTab({ index }: { index: number }): void {
+    this.tabs.splice(index, 1);
+  }
+
+  newTab(): void {
+    this.tabs.push('New Tab');
+    this.selectedIndex = this.tabs.length;
+  }
+  private transformer = (node: ElementItem, level: number): FlatNode => ({
+    expandable: !!node.children && node.children.length > 0,
+    name: node.name,
+    level,
+  });
+
+  treeControl = new FlatTreeControl<FlatNode>(
+    (node) => node.level,
+    (node) => node.expandable
+  );
+
+  treeFlattener = new NzTreeFlattener(
+    this.transformer,
+    (node) => node.level,
+    (node) => node.expandable,
+    (node) => node.children
+  );
+
+  dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
+
+  showLeafIcon = false;
+
+  constructor() { }
+
+  hasChild = (_: number, node: FlatNode): boolean => node.expandable;
+
+  getNode(name: string): FlatNode | null {
+    return this.treeControl.dataNodes.find((n) => n.name === name) || null;
+  }
+  add() {
+
   }
 }

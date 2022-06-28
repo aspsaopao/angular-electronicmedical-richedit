@@ -1,4 +1,5 @@
  # 基本使用
+
   > 方法
   >> onSave=>文件保存前
  
@@ -19,7 +20,9 @@
 
   >>> patientMedicalList PMItem[] 患者历史病历列表 
 
-#设置样式
+#  设置样式
+
+ 引用了antd组件和dev_richedit组件
 ```javascript
 "styles": [
           "src/styles.css",
