@@ -36,6 +36,31 @@ export interface OptionsEx {
    * 高度
    */
   height: string;
+  /**
+   *左边要素目录
+   * */
+  elementList: ElementItem[];
+  /**
+   *患者历史病历列表
+   * */
+  patientMedicalList:PMItem[]
+}
+
+export interface ElementItem {
+
+  id: string;
+
+  name: string;
+
+  parentId: string
+}
+
+export interface PMItem {
+  medicalId: string;
+
+  medicalName: string;
+
+  createtime: string;
 }
 
 @Component({

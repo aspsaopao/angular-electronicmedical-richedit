@@ -1,6 +1,6 @@
 {
-  "name": "zttest-components",
-  "version": "0.0.8",
+  "name": "angular-richedit",
+  "version": "0.0.10",
   "description": "电子病历编辑器组件",
   "author": "alownilow",
   "peerDependencies": {

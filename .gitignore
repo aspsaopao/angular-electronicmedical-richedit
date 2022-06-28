@@ -41,3 +41,5 @@ testem.log
 .DS_Store
 Thumbs.db
 /projects/components/node_modules
+/.vs/richedit/config
+/.vs/*
