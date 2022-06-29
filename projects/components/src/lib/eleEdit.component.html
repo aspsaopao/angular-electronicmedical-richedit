@@ -9,7 +9,8 @@
 
           <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
             <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodeIndentLine>
-              <nz-tree-node-toggle nzTreeNodeNoopToggle *ngIf="showLeafIcon">
+              <nz-tree-node-toggle *ngIf="showLeafIcon" nzTreeNodeNoopToggle>
+                <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
               </nz-tree-node-toggle>
               <nz-tree-node-option>
                 {{ node.name }}
@@ -18,6 +19,7 @@
 
             <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodeIndentLine>
               <nz-tree-node-toggle>
+                <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
               </nz-tree-node-toggle>
               <nz-tree-node-option>
                 {{ node.name }}

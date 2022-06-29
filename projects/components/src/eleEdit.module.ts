@@ -13,12 +13,6 @@ import {
   NZ_ICONS,
 } from 'ng-zorro-antd/icon';
 import { IconDefinition } from '@ant-design/icons-angular';
-import {
-  AccountBookFill,
-  AlertFill,
-  AlertOutline,
-} from '@ant-design/icons-angular/icons';
-const icons: IconDefinition[] = [AccountBookFill, AlertOutline, AlertFill];
 @NgModule({
   imports: [
     CommonModule,
@@ -27,12 +21,11 @@ const icons: IconDefinition[] = [AccountBookFill, AlertOutline, AlertFill];
     NzGridModule,
     NzTabsModule,
     NzTreeViewModule,
-    NzIconModule,
     NzTreeModule,
+    NzIconModule
   ],
   providers: [
     { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' }, // 不提供的话，即为 Ant Design 的主题蓝色
-    { provide: NZ_ICONS, useValue: icons },
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [EleEditComponent],
