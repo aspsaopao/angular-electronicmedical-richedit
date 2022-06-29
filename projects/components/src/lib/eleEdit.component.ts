@@ -226,7 +226,7 @@ export class EleEditComponent implements OnInit {
     };
     options.readOnly = false;
     options.width = this.editOption.width;
-    options.height = this.editOption.height;
+    options.height = document.body.clientHeight - 50 + "px";
     let element = document.getElementById('RichEdit');
     if (element !== null) this.rich = create(element, options);
     this.rich.openDocument(
