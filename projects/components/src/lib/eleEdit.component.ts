@@ -102,10 +102,6 @@ export class EleEditComponent implements OnInit {
 
   ngOnInit() { }
 
-  query(info: string) {
-    this.onSave.emit(null);
-  }
-
   private rich!: RichEdit;
 
   ngAfterViewInit(): void {
