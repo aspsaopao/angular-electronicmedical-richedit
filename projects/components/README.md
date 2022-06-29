@@ -9,7 +9,7 @@
   <ng-ele-richEdit [editOption]="editOption" (onSaving)="onSaving($event)" (onSave)="onSave($event)">
     </ng-ele-richEdit>
 ```
-## 对应 component.ts
+## 对应 component.ts(测试数据，最终数据以真实性为准)
 ```JavaScript
  editOption: OptionsEx = {
     width: '1200px',
@@ -53,20 +53,20 @@
 ```
 > ## 属性  
 
-  属性   | 类型   | 描述/列举值
- ----    | -----  | ------  
- width   | string | 宽度 "100px"
- hegiht  | string | 高度 "90px"
- documentBase64  | string | 文件信息base64编码
- elementList  | ElementItem[] | 左边要素信息
- isShowCode  | bool | 是否显示代码-用户进行一开始进去呈现代码值还是对应的真实数据值 
- patientMedicalList  | PMItem[]  | 患者历史病历列表
- richEditValueData  | EditValueItem[] | 患者病历模板字段对应显示值
+  | 属性               | 类型            | 描述/列举值                                                   |
+  | ------------------ | --------------- | ------------------------------------------------------------- |
+  | width              | string          | 宽度 "100px"                                                  |
+  | hegiht             | string          | 高度 "90px"                                                   |
+  | documentBase64     | string          | 文件信息base64编码                                            |
+  | elementList        | ElementItem[]   | 左边要素信息                                                  |
+  | isShowCode         | bool            | 是否显示代码-用户进行一开始进去呈现代码值还是对应的真实数据值 |
+  | patientMedicalList | PMItem[]        | 患者历史病历列表                                              |
+  | richEditValueData  | EditValueItem[] | 患者病历模板字段对应显示值                                    |
 > ## 方法  
-方法名   | 类型   | 描述/列举值
- ----    | -----  | ------  
- onSave   | (v: RichEdit): void | 文件保存前
- onSaveing   | (v: RichEdit): void | 文件保存后
+| 方法名    | 类型                | 描述/列举值 |
+| --------- | ------------------- | ----------- |
+| onSave    | (v: RichEdit): void | 文件保存前  |
+| onSaveing | (v: RichEdit): void | 文件保存后  |
 
 #  设置样式
 
@@ -78,4 +78,12 @@
           "./node_modules/devextreme/dist/css/dx.light.css",
           "./node_modules/devexpress-richedit/dist/dx.richedit.css"
           ],
+"assets": [
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
+              }
+            ],
+
 ```
