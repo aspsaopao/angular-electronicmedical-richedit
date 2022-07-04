@@ -10,6 +10,7 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { HttpClientModule } from '@angular/common/http';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzTableModule } from 'ng-zorro-antd/table';
 import {
   NzIconModule,
   NZ_ICON_DEFAULT_TWOTONE_COLOR,
@@ -28,7 +29,8 @@ import { IconDefinition } from '@ant-design/icons-angular';
     NzIconModule,
     NzUploadModule,
     HttpClientModule,
-    NzSpaceModule
+    NzSpaceModule,
+    NzTableModule
   ],
   providers: [
     { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' }, // 不提供的话，即为 Ant Design 的主题蓝色

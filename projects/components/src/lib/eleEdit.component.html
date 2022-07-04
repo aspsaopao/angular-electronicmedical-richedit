@@ -28,6 +28,20 @@
         </nz-tab>
         <nz-tab nzTitle="患者病历">
 
+          <nz-table [nzShowPagination]="false" nzSize="small" #basicTable [nzData]="editOption.patientMedicalList">
+            <thead>
+              <tr>
+                <th>病历名称</th>
+                <th>添加时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of basicTable.data" (dblclick)="patientmedicaldbClick(data)">
+                <td>{{data.medicalName}}</td>
+                <td>{{data.createtime}}</td>
+              </tr>
+            </tbody>
+          </nz-table>
         </nz-tab>
         <nz-tab nzTitle="范文">Content of Tab Pane 3</nz-tab>
       </nz-tabset>

@@ -16,7 +16,7 @@ import {
 } from 'devexpress-richedit';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
-import { ElementItem, FlatNode, OptionsEx, FlatNodeEx, SaveFiles } from '../eleeditintarface';
+import { ElementItem, FlatNode, OptionsEx, FlatNodeEx, SaveFiles, PMItem } from '../eleeditintarface';
 
 
 @Component({
@@ -34,6 +34,7 @@ export class EleEditComponent implements OnInit {
    */
   @Output() onSave = new EventEmitter<SaveFiles>();
   @Output() onSaving = new EventEmitter<RichEdit>();
+  @Output() onPatientmedicaldbClick = new EventEmitter<PMItem>();
 
   private rich!: RichEdit;
 
@@ -44,6 +45,14 @@ export class EleEditComponent implements OnInit {
 
   ngAfterViewInit(): void {
     this.fieids = [];
+    this.editOption.openDocument = (a, v) => {
+      console.log(a, v);
+      this.rich.openDocument(
+        a,
+        'documentName',
+        v as unknown as DocumentFormat
+      );
+    }
     const options = createOptions();
     options.ribbon.removeTab(RibbonTabType.Home);
     options.ribbon.removeTab(RibbonTabType.File);
@@ -217,5 +226,11 @@ export class EleEditComponent implements OnInit {
 
     this.rich.endUpdate();
     this.rich.focus();
+  }
+  /**
+   * 病历选择并替换
+   */
+  patientmedicaldbClick(e) {
+    this.onPatientmedicaldbClick.emit(e);
   }
 }
