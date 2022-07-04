@@ -114,7 +114,6 @@ export class EleEditComponent implements OnInit {
     */
   calculateDocumentVariable(options) {
     options.events.calculateDocumentVariable = (s, e) => {
-      console.log(1111111, e);
       if (e.variableName !== "CustomProperty")
         return;
       let key = e?.args[0] ?? "";

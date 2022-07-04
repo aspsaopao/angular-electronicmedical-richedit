@@ -6,31 +6,54 @@
 ```
 ## 对应 component.html
 ```JavaScript
-  <ng-ele-richEdit [editOption]="editOption" (onSaving)="onSaving($event)" (onSave)="onSave($event)">
+  <ng-ele-richEdit [editOption]="editOption" (onSaving)="onSaveing($event)" (onSave)="onSave($event)">
     </ng-ele-richEdit>
 ```
 ## 对应 component.ts(测试数据，最终数据以真实性为准)
 ```JavaScript
  editOption: OptionsEx = {
     width: '1200px',
-    isShowCode: true,
+    type: DocumentFormat.Rtf,
+    isShowCode: false,
+    richEditValueData: [
+      {
+        id: '123',
+        value: '张三'
+      },
+      {
+        id: '12345',
+        value: '李四'
+      },
+      {
+        id:'01802237-b64c-4330-8010-1b28c1568956',
+        value:'我自己测试的医院'
+      }
+    ],
     height: '900px',
-    elementList: [
+     elementList: [
       {
         name: '门诊相关',
         id: 'string',
         children: [
           {
+            id: "123",
             name: '患者姓名',
           },
           {
+            id: '1234',
             name: '患者年龄',
           },
         ],
       },
       {
         name: '住院',
-        children: [{ name: '住院时间' }, { name: 'l住院日期eaf' }],
+        children: [{
+          id: '12345',
+          name: '住院时间'
+        }, {
+          id: '123456',
+          name: '住院日期'
+        }],
       },
     ],
     documentBase64:
@@ -45,19 +68,19 @@
       'mczIyXGNmMFxjczEgRG9jdW1lbnQgdGV4dH1cZnMyMlxjZjBccGFyfQ==',
   };
   onSave(info: any) {
-    console.log(111, info);
+    
   }
-  onSaving(info: any) {
-    console.log(222, info);
+  onSaveing(info: any) {
+  
   }
 ```
 > ## 属性  
 
   | 属性               | 类型            | 描述/列举值                                                   |
   | ------------------ | --------------- | ------------------------------------------------------------- |
-  | width              | string          | 宽度 "100px"                                                  |
-  | hegiht             | string          | 高度 "90px"                                                   |
-  | documentContent     |  File  Blob  ArrayBuffer  string          | 文件信息                                           |
+  | width              | string         | 宽度 "100px"                                                  |
+  | hegiht             | string         | 高度 "90px"                                                   |
+  | documentContent    | 'File'丨'Blob'丨'ArrayBuffer'丨'string(base64)'        | 文件信息                                           |
   | type     |  DocumentFormat        | 文件类型                                           |
   | elementList        | ElementItem[]   | 左边要素信息                                                  |
   | isShowCode         | bool                 | 是否显示代码-用户进行一开始进去呈现代码值还是对应的真实数据值 |
@@ -66,9 +89,8 @@
 > ## 方法  
 | 方法名    | 类型                | 描述/列举值 |
 | --------- | ------------------- | ----------- |
-| onSave    | (v: SaveFiles): void | 文件保存前  |
-| onSaveing | (v: RichEdit): void | 文件保存后  |
-
+| onSave    | (v: SaveFiles) => void | 文件保存前调用  |
+| onSaveing | (v: RichEdit)  =>void | 文件保存后调用(目前不实现)  |
 #  设置样式
 
 ## 引用了antd组件和dev_richedit组件
