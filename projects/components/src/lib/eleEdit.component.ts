@@ -11,6 +11,7 @@ import {
   DocumentFormat,
   PrintMode,
   RibbonTabType,
+  ParagraphAlignment,
   RichEdit,
 } from 'devexpress-richedit';
 import { FlatTreeControl } from '@angular/cdk/tree';
@@ -198,5 +199,24 @@ export class EleEditComponent implements OnInit {
   }
   print() {
     this.rich.printDocument(PrintMode.Html);
+  }
+  addSignature() {
+    this.rich.beginUpdate();
+    //末尾行添加签名
+    this.rich.selection.goToDocumentEnd(false)
+
+    var subDocument = this.rich.selection.activeSubDocument;
+    var position = this.rich.selection.active;
+    position = subDocument.insertText(position, '医生签名： 测试医生名称').end;
+
+    var pg = subDocument.insertParagraph(position);
+    var properties = pg.properties;
+    properties.alignment = ParagraphAlignment.Right;
+    pg.properties = properties;
+
+    position = pg.interval.end;
+
+    this.rich.endUpdate();
+    this.rich.focus();
   }
 }
