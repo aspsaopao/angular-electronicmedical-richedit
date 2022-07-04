@@ -15,7 +15,9 @@ import {
   HomeTabItemId,
   Interval,
   Options,
+  PrintMode,
   RibbonButtonItem,
+  RibbonItem,
   RibbonTab,
   RibbonTabType,
   RichEdit,
@@ -26,7 +28,7 @@ import {
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
-import { ElementItem, FlatNode, OptionsEx } from '../eleeditintarface';
+import { ElementItem, FlatNode, OptionsEx, FlatNodeEx } from '../eleeditintarface';
 
 @Component({
   selector: 'ng-ele-richEdit',
@@ -41,46 +43,46 @@ export class EleEditComponent implements OnInit {
   /**
    * 文件保存事件传出
    */
-  @Output() onSave = new EventEmitter<RichEdit>();
+  @Output() onSave = new EventEmitter<File>();
   @Output() onSaving = new EventEmitter<RichEdit>();
 
   ngOnInit() { }
 
+  query(info: string) {
+    this.onSave.emit(null);
+  }
+
   private rich!: RichEdit;
 
   ngAfterViewInit(): void {
-    // this.editOption.RichEdit = createOptions();
-    // the createOptions() method creates an object that contains RichEdit options initialized with default values
     const options = createOptions();
+    options.ribbon.removeTab(RibbonTabType.Home);
+    options.ribbon.removeTab(RibbonTabType.File);
+    options.ribbon.removeTab(RibbonTabType.Insert);
+    options.ribbon.removeTab(RibbonTabType.PageLayout);
+    options.ribbon.removeTab(RibbonTabType.MailMerge);
+    options.ribbon.removeTab(RibbonTabType.View);
+    options.ribbon.removeTab(RibbonTabType.References);
 
-    // options.bookmarks.visibility = true;
-    // options.bookmarks.color = '#ff0000';
-
-    // options.confirmOnLosingChanges.enabled = true;
-    // options.confirmOnLosingChanges.message =
-    //   'Are you sure you want to perform the action? All unsaved document data will be lost.';
-
-    // options.fields.updateFieldsBeforePrint = true;
-    // options.fields.updateFieldsOnPaste = true;
-
-    // options.mailMerge.activeRecord = 2;
-    // options.mailMerge.viewMergedData = true;
-    // options.mailMerge.dataSource = [
-    //   { Name: 'Indy', age: 32 },
-    //   { Name: 'Andy', age: 28 },
-    // ];
-
+    const newFindTab = options.ribbon.insertTab(new RibbonTab('文件', 'system1', []), 1);
+    const newFindTab2 = options.ribbon.insertTab(new RibbonTab('功能', 'system2', []), 2);
+    newFindTab.insertItem(new RibbonButtonItem('saveId', '保存', { beginGroup: true }), 1);
+    newFindTab.insertItem(new RibbonButtonItem('printId', '打印', { beginGroup: true }), 2);
+    newFindTab2.insertItem(new RibbonButtonItem('printId', '病历调动', { beginGroup: true }), 1);
+    options.events.customCommandExecuted = (s, e) => {
+      if (e.commandName === 'saveId') {
+        s.exportToFile(t => {
+          this.onSave.emit(t);
+        }, DocumentFormat.OpenXml)
+      }
+      else if (e.commandName == "printId") {
+        s.printDocument(PrintMode.Html);
+      }
+    };
     // events
     options.events.activeSubDocumentChanged = () => { };
     options.events.autoCorrect = () => { };
-    options.events.calculateDocumentVariable = (a, b) => {
-      if (!this.editOption.isShowCode) {
-        let value =
-          this.editOption.richEditValueData.find((t) => t.id === b.args[0])
-            ?.value ?? '';
-        b.value = value;
-      }
-    };
+
     options.events.characterPropertiesChanged = () => { };
     options.events.contentInserted = () => { };
     options.events.contentRemoved = () => { };
@@ -96,87 +98,50 @@ export class EleEditComponent implements OnInit {
     options.events.pointerDown = () => { };
     options.events.pointerUp = () => { };
     options.events.saving = (s: RichEdit) => {
-      this.onSave.emit(s);
+      s.exportToFile(t => {
+        this.onSave.emit(t);
+      }, DocumentFormat.OpenXml)
     };
     options.events.saved = (s: RichEdit) => {
       this.onSaving.emit(s);
     };
+
     options.events.selectionChanged = () => { };
-    options.events.customCommandExecuted = (s, e) => {
-      switch (e.commandName) {
-        case 'insertEmailSignature':
-          s.document.insertParagraph(s.document.length);
-          s.document.insertText(s.document.length, '_________');
-          s.document.insertParagraph(s.document.length);
-          s.document.insertText(s.document.length, 'Best regards,');
-          s.document.insertParagraph(s.document.length);
-          s.document.insertText(s.document.length, 'John Smith');
-          s.document.insertParagraph(s.document.length);
-          s.document.insertText(s.document.length, 'john@example.com');
-          s.document.insertParagraph(s.document.length);
-          s.document.insertText(s.document.length, '+1 (818) 844-0000');
-          break;
-      }
-    };
 
-    options.unit = RichEditUnit.Inch;
-
-    // options.view.viewType = ViewType.PrintLayout;
-    // options.view.simpleViewSettings.paddings = {
-    //   left: 15,
-    //   top: 15,
-    //   right: 15,
-    //   bottom: 15,
-    // };
-
-    options.autoCorrect = {
-      correctTwoInitialCapitals: true,
-      detectUrls: true,
-      enableAutomaticNumbering: true,
-      replaceTextAsYouType: true,
-      caseSensitiveReplacement: false,
-      replaceInfoCollection: [
-        { replace: 'wnwd', with: 'well-nourished, well-developed' },
-        { replace: '(c)', with: '©' },
-      ],
-    };
-    // capitalize the first letter at the beginning of a new sentence/line
-    options.events.autoCorrect = function (s, e) {
-      if (e.text.length == 1 && /\w/.test(e.text)) {
-        var prevText = s.document.getText(
-          new Interval(e.interval.start - 2, 2)
-        );
-        if (
-          prevText.length == 0 ||
-          /^(\. |\? |\! )$/.test(prevText) ||
-          prevText.charCodeAt(1) == 13
-        ) {
-          var newText = e.text.toUpperCase();
-          if (newText != e.text) {
-            s.beginUpdate();
-            s.history.beginTransaction();
-            s.document.deleteText(e.interval);
-            s.document.insertText(e.interval.start, newText);
-            s.history.endTransaction();
-            s.endUpdate();
-            e.handled = true;
-          }
-        }
-      }
-    };
     options.readOnly = false;
-    options.width = this.editOption.width;
+    // options.width = this.editOption.width;
     options.height = document.body.clientHeight - 50 + "px";
+
+    this.calculateDocumentVariable(options);
+
     let element = document.getElementById('RichEdit');
     if (element !== null) this.rich = create(element, options);
     this.rich.openDocument(
-      this.editOption.documentBase64,
-      'DocumentName',
-      DocumentFormat.Rtf
+      this.editOption.documentContent,
+      'documentName',
+      this.editOption.type as unknown as DocumentFormat
     );
+    this.rich.hasUnsavedChanges = true;
+
     this.dataSource.setData(this.editOption.elementList);
 
     this.treeControl.expandAll();
+  }
+  /**
+    * 文本替换方法
+    */
+  calculateDocumentVariable(options) {
+    options.events.calculateDocumentVariable = (a, b) => {
+      if (!this.editOption.isShowCode) {
+        let value =
+          this.editOption.richEditValueData.find((t) => t.id === b.args[0])
+            ?.value ?? b.variableName;
+        b.value = value;
+      }
+      else {
+        b.value = b.variableName;
+      }
+    };
   }
 
   ngOnDestroy() {
@@ -185,22 +150,15 @@ export class EleEditComponent implements OnInit {
       this.rich = null;
     }
   }
-  tabs = ['Tab 1', 'Tab 2'];
   selectedIndex = 0;
 
-  closeTab({ index }: { index: number }): void {
-    this.tabs.splice(index, 1);
-  }
-
-  newTab(): void {
-    this.tabs.push('New Tab');
-    this.selectedIndex = this.tabs.length;
-  }
-  private transformer = (node: ElementItem, level: number): FlatNode => ({
-    expandable: !!node.children && node.children.length > 0,
-    name: node.name,
-    level,
-  });
+  private transformer = (node: ElementItem, level: number): FlatNodeEx => (
+    {
+      expandable: !!node.children && node.children.length > 0,
+      name: node.name,
+      level,
+      id: node.id,
+    });
 
   treeControl = new FlatTreeControl<FlatNode>(
     (node) => node.level,
@@ -225,7 +183,19 @@ export class EleEditComponent implements OnInit {
   getNode(name: string): FlatNode | null {
     return this.treeControl.dataNodes.find((n) => n.name === name) || null;
   }
-  add() {
 
+  hideCode() {
+    this.editOption.isShowCode = true;
+    this.rich.document.fields.updateAllFields(() => { });
+
+  }
+  hidetest() {
+    this.editOption.isShowCode = false;
+    this.rich.document.fields.updateAllFields(() => { });
+  }
+  eleTreeClick(b: FlatNodeEx) {
+    this.rich.selection.activeSubDocument.fields.create(this.rich.selection.active, `DOCVARIABLE  ${b.name} ${b.id}`);
+    this.rich.document.fields.updateAllFields(() => { });
+    this.rich.focus();
   }
 }

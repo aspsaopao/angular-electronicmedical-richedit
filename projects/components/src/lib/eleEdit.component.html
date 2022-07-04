@@ -1,18 +1,14 @@
-<div id="eleedit" style="width: {editOption.width};height: {ededitOption.height}">
+<div id="eleedit" style="width: {{editOption.width}};height: {{editOption.height}}">
   <div nz-row>
     <div nz-col nzSpan="4">
-      <button nz-button nzType="primary" (click)="add()">追加字1段</button>
-      <button nz-button nzType="primary">显示文字</button>
-      <button nz-button nzType="primary">显示绑定代码</button>
       <nz-tabset>
         <nz-tab nzTitle="要素">
-
           <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
             <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodeIndentLine>
               <nz-tree-node-toggle *ngIf="showLeafIcon" nzTreeNodeNoopToggle>
                 <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
               </nz-tree-node-toggle>
-              <nz-tree-node-option>
+              <nz-tree-node-option (nzClick)="eleTreeClick(node)">
                 {{ node.name }}
               </nz-tree-node-option>
             </nz-tree-node>
@@ -28,9 +24,8 @@
           </nz-tree-view>
 
         </nz-tab>
-        <nz-tab nzTitle="患者病历">Content of Tab Pane 2</nz-tab>
-        <nz-tab nzTitle="范文">Content of Tab Pane 3</nz-tab>
-        <nz-tab nzTitle="字符">Content of Tab Pane 4</nz-tab>
+        <nz-tab nzTitle="患者病历">新功能开发中</nz-tab>
+        <nz-tab nzTitle="范文">新功能开发中</nz-tab>
       </nz-tabset>
     </div>
     <div nz-col nzSpan="20">

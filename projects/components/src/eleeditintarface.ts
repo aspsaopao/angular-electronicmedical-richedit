@@ -1,3 +1,5 @@
+import { DocumentFormat } from "./documentFormat";
+
 export interface FlatNode {
   expandable: boolean;
   name: string;
@@ -8,7 +10,11 @@ export interface OptionsEx {
   /**
    * 文件信息
    */
-  documentBase64?: string;
+  documentContent?: File | Blob | ArrayBuffer | string;
+  /**
+   * 文件类型
+   */
+  type?: DocumentFormat;
   /**
    * 宽度
    */
@@ -55,3 +61,8 @@ export interface PMItem {
 
   createtime: string;
 }
+
+export interface FlatNodeEx extends FlatNode {
+  id?: string;
+}
+
