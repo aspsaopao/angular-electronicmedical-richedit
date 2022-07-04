@@ -1,7 +1,7 @@
 {
   "name": "angular-richedit",
-  "version": "0.0.18",
-  "description": "电子病历编辑器组件",
+  "version": "0.0.19",
+  "description": "众桐技术电子病历编辑器",
   "author": "alownilow",
   "peerDependencies": {
     "@angular/common": "^13.3.2",
