@@ -1,8 +1,10 @@
 <div id="eleedit" style="width: {{editOption.width}};height: {{editOption.height}}">
+
   <div nz-row>
     <div nz-col nzSpan="4">
       <nz-tabset>
         <nz-tab nzTitle="要素">
+
           <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
             <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodeIndentLine>
               <nz-tree-node-toggle *ngIf="showLeafIcon" nzTreeNodeNoopToggle>
@@ -24,11 +26,48 @@
           </nz-tree-view>
 
         </nz-tab>
-        <nz-tab nzTitle="患者病历">新功能开发中</nz-tab>
-        <nz-tab nzTitle="范文">新功能开发中</nz-tab>
+        <nz-tab nzTitle="患者病历">
+
+        </nz-tab>
+        <nz-tab nzTitle="范文">Content of Tab Pane 3</nz-tab>
       </nz-tabset>
     </div>
     <div nz-col nzSpan="20">
+      <nz-tabset>
+        <nz-tab nzTitle="文件">
+          <div class="richeditmenu">
+            <nz-space>
+              <button *nzSpaceItem nz-button (click)="save()">保存</button>
+              <button *nzSpaceItem nz-button (click)="print()">打印</button>
+              <nz-upload *nzSpaceItem [nzBeforeUpload]="beforeUpload"
+                         [nzOpenFileDialogOnClick]="openFileDialogOnClick">
+                <button nz-button id="upload">
+                  打开
+                </button>
+              </nz-upload>
+            </nz-space>
+          </div>
+        </nz-tab>
+        <nz-tab nzTitle="功能">
+          <div class="richeditmenu">
+            <nz-space>
+              <button *nzSpaceItem nz-button>病历调用</button>
+              <button *nzSpaceItem nz-button>签名添加</button>
+            </nz-space>
+          </div>
+
+
+        </nz-tab>
+        <nz-tab nzTitle="其他">
+          <div class="richeditmenu">
+            <nz-space>
+              <button *nzSpaceItem nz-button>参数设置</button>
+              <button *nzSpaceItem nz-button>提交建议</button>
+            </nz-space>
+
+          </div>
+        </nz-tab>
+      </nz-tabset>
       <div id="RichEdit"></div>
     </div>
   </div>

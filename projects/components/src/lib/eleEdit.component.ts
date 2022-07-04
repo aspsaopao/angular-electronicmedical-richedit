@@ -4,31 +4,19 @@ import {
   Input,
   Output,
   EventEmitter,
-  ElementRef,
-  AfterViewInit,
 } from '@angular/core';
 import {
   create,
   createOptions,
   DocumentFormat,
-  FileTabItemId,
-  HomeTabItemId,
-  Interval,
-  Options,
   PrintMode,
-  RibbonButtonItem,
-  RibbonItem,
-  RibbonTab,
   RibbonTabType,
   RichEdit,
-  RichEditUnit,
-  SavingEventArgs,
-  ViewType,
 } from 'devexpress-richedit';
-import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
-import { ElementItem, FlatNode, OptionsEx, FlatNodeEx } from '../eleeditintarface';
+import { ElementItem, FlatNode, OptionsEx, FlatNodeEx, SaveFiles } from '../eleeditintarface';
+
 
 @Component({
   selector: 'ng-ele-richEdit',
@@ -43,18 +31,18 @@ export class EleEditComponent implements OnInit {
   /**
    * 文件保存事件传出
    */
-  @Output() onSave = new EventEmitter<File>();
+  @Output() onSave = new EventEmitter<SaveFiles>();
   @Output() onSaving = new EventEmitter<RichEdit>();
-
-  ngOnInit() { }
-
-  query(info: string) {
-    this.onSave.emit(null);
-  }
 
   private rich!: RichEdit;
 
+  ngOnInit() { }
+
+  constructor() { }
+  openFileDialogOnClick = true;
+
   ngAfterViewInit(): void {
+    this.fieids = [];
     const options = createOptions();
     options.ribbon.removeTab(RibbonTabType.Home);
     options.ribbon.removeTab(RibbonTabType.File);
@@ -63,22 +51,8 @@ export class EleEditComponent implements OnInit {
     options.ribbon.removeTab(RibbonTabType.MailMerge);
     options.ribbon.removeTab(RibbonTabType.View);
     options.ribbon.removeTab(RibbonTabType.References);
+    options.ribbon.visible = false;
 
-    const newFindTab = options.ribbon.insertTab(new RibbonTab('文件', 'system1', []), 1);
-    const newFindTab2 = options.ribbon.insertTab(new RibbonTab('功能', 'system2', []), 2);
-    newFindTab.insertItem(new RibbonButtonItem('saveId', '保存', { beginGroup: true }), 1);
-    newFindTab.insertItem(new RibbonButtonItem('printId', '打印', { beginGroup: true }), 2);
-    newFindTab2.insertItem(new RibbonButtonItem('printId', '病历调动', { beginGroup: true }), 1);
-    options.events.customCommandExecuted = (s, e) => {
-      if (e.commandName === 'saveId') {
-        s.exportToFile(t => {
-          this.onSave.emit(t);
-        }, DocumentFormat.OpenXml)
-      }
-      else if (e.commandName == "printId") {
-        s.printDocument(PrintMode.Html);
-      }
-    };
     // events
     options.events.activeSubDocumentChanged = () => { };
     options.events.autoCorrect = () => { };
@@ -98,8 +72,14 @@ export class EleEditComponent implements OnInit {
     options.events.pointerDown = () => { };
     options.events.pointerUp = () => { };
     options.events.saving = (s: RichEdit) => {
+
+      this.rich.document.fields.updateAllFields(() => { });
+
       s.exportToFile(t => {
-        this.onSave.emit(t);
+        this.onSave.emit({
+          file: t,
+          fileIds: this.fieids
+        });
       }, DocumentFormat.OpenXml)
     };
     options.events.saved = (s: RichEdit) => {
@@ -122,7 +102,8 @@ export class EleEditComponent implements OnInit {
       this.editOption.type as unknown as DocumentFormat
     );
     this.rich.hasUnsavedChanges = true;
-
+    this.rich.selection.goToNextWord(false)
+    this.rich.focus();
     this.dataSource.setData(this.editOption.elementList);
 
     this.treeControl.expandAll();
@@ -131,19 +112,25 @@ export class EleEditComponent implements OnInit {
     * 文本替换方法
     */
   calculateDocumentVariable(options) {
-    options.events.calculateDocumentVariable = (a, b) => {
+    options.events.calculateDocumentVariable = (s, e) => {
+      console.log(1111111, e);
+      if (e.variableName !== "CustomProperty")
+        return;
+      let key = e?.args[0] ?? "";
+      let presentedValue = e?.args[1] ?? "未知属性";
       if (!this.editOption.isShowCode) {
-        let value =
-          this.editOption.richEditValueData.find((t) => t.id === b.args[0])
-            ?.value ?? b.variableName;
-        b.value = value;
+        let value = this.editOption.richEditValueData.find((t) => t.id === key)
+          ?.value ?? "------";
+        e.value = value;
       }
       else {
-        b.value = b.variableName;
+        e.value = presentedValue;
       }
+      if (this.fieids.find(t => t === key) === undefined)
+        this.fieids.push(key);
     };
   }
-
+  fieids: string[] = [];
   ngOnDestroy() {
     if (this.rich) {
       this.rich.dispose();
@@ -176,26 +163,40 @@ export class EleEditComponent implements OnInit {
 
   showLeafIcon = false;
 
-  constructor() { }
 
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;
 
   getNode(name: string): FlatNode | null {
     return this.treeControl.dataNodes.find((n) => n.name === name) || null;
   }
-
-  hideCode() {
-    this.editOption.isShowCode = true;
-    this.rich.document.fields.updateAllFields(() => { });
-
-  }
-  hidetest() {
-    this.editOption.isShowCode = false;
-    this.rich.document.fields.updateAllFields(() => { });
-  }
+  /**
+   * 左边要素点击事件
+   * @param b 
+   */
   eleTreeClick(b: FlatNodeEx) {
-    this.rich.selection.activeSubDocument.fields.create(this.rich.selection.active, `DOCVARIABLE  ${b.name} ${b.id}`);
+
+    this.rich.selection.activeSubDocument.fields.create(this.rich.selection.active, `DOCVARIABLE CustomProperty ${b.id}  ${b.name}  `);
     this.rich.document.fields.updateAllFields(() => { });
+    this.rich.selection.showCursorAtEndOfLine = false;
+    this.rich.selection.goToNextWord(false)
     this.rich.focus();
+  }
+
+  beforeUpload = (file): boolean => {
+    this.rich.openDocument(file, "", DocumentFormat.OpenXml);
+    return false;
+  };
+
+  save() {
+    this.rich.document.fields.updateAllFields(() => { });
+    this.rich.exportToFile(t => {
+      this.onSave.emit({
+        file: t,
+        fileIds: this.fieids
+      });
+    }, DocumentFormat.OpenXml)
+  }
+  print() {
+    this.rich.printDocument(PrintMode.Html);
   }
 }

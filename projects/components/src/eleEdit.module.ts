@@ -7,6 +7,9 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
+import { NzUploadModule } from 'ng-zorro-antd/upload';
+import { HttpClientModule } from '@angular/common/http';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import {
   NzIconModule,
   NZ_ICON_DEFAULT_TWOTONE_COLOR,
@@ -22,7 +25,10 @@ import { IconDefinition } from '@ant-design/icons-angular';
     NzTabsModule,
     NzTreeViewModule,
     NzTreeModule,
-    NzIconModule
+    NzIconModule,
+    NzUploadModule,
+    HttpClientModule,
+    NzSpaceModule
   ],
   providers: [
     { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' }, // 不提供的话，即为 Ant Design 的主题蓝色

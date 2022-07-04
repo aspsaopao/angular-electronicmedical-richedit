@@ -57,7 +57,8 @@
   | ------------------ | --------------- | ------------------------------------------------------------- |
   | width              | string          | 宽度 "100px"                                                  |
   | hegiht             | string          | 高度 "90px"                                                   |
-  | documentBase64     | string          | 文件信息base64编码                                            |
+  | documentContent     |  File  Blob  ArrayBuffer  string          | 文件信息                                           |
+  | type     |  DocumentFormat        | 文件类型                                           |
   | elementList        | ElementItem[]   | 左边要素信息                                                  |
   | isShowCode         | bool                 | 是否显示代码-用户进行一开始进去呈现代码值还是对应的真实数据值 |
   | patientMedicalList | PMItem[]        | 患者历史病历列表                                              |
@@ -65,7 +66,7 @@
 > ## 方法  
 | 方法名    | 类型                | 描述/列举值 |
 | --------- | ------------------- | ----------- |
-| onSave    | (v: RichEdit): void | 文件保存前  |
+| onSave    | (v: SaveFiles): void | 文件保存前  |
 | onSaveing | (v: RichEdit): void | 文件保存后  |
 
 #  设置样式
