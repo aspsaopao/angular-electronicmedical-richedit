@@ -1,6 +1,6 @@
 {
   "name": "angular-richedit",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "众桐技术电子病历编辑器",
   "author": "alownilow",
   "peerDependencies": {

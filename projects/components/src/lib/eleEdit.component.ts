@@ -33,7 +33,13 @@ export class EleEditComponent implements OnInit {
    * 文件保存事件传出
    */
   @Output() onSave = new EventEmitter<SaveFiles>();
+  /**
+  * 文件保存事件传出
+  */
   @Output() onSaving = new EventEmitter<RichEdit>();
+  /**
+  * 病历列表双击
+  */
   @Output() onPatientmedicaldbClick = new EventEmitter<PMItem>();
 
   private rich!: RichEdit;
@@ -46,12 +52,13 @@ export class EleEditComponent implements OnInit {
   ngAfterViewInit(): void {
     this.fieids = [];
     this.editOption.openDocument = (a, v) => {
-      console.log(a, v);
       this.rich.openDocument(
         a,
         'documentName',
         v as unknown as DocumentFormat
       );
+
+      this.rich.focus();
     }
     const options = createOptions();
     options.ribbon.removeTab(RibbonTabType.Home);
