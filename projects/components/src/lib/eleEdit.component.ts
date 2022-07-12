@@ -4,11 +4,12 @@ import {
   Input,
   Output,
   EventEmitter,
+  SimpleChange,
 } from '@angular/core';
 import {
   create,
   createOptions,
-  DocumentFormat,
+  DocumentFormat as DocumentFormatEx,
   PrintMode,
   RibbonTabType,
   ParagraphAlignment,
@@ -17,6 +18,7 @@ import {
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
 import { ElementItem, FlatNode, OptionsEx, FlatNodeEx, SaveFiles, PMItem } from '../eleeditintarface';
+import { DocumentFormat } from '../documentFormat';
 
 
 @Component({
@@ -29,6 +31,7 @@ export class EleEditComponent implements OnInit {
    * 配置信息
    */
   @Input() editOption: OptionsEx = null;
+
   /**
    * 文件保存事件传出
    */
@@ -42,24 +45,21 @@ export class EleEditComponent implements OnInit {
   */
   @Output() onPatientmedicaldbClick = new EventEmitter<PMItem>();
 
-  private rich!: RichEdit;
+  /**
+   * 编辑器
+   */
+  private rich: RichEdit = null;
+  /**
+   * 文档使用字段
+   */
+  fieids: string[] = [];
 
-  ngOnInit() { }
-
-  constructor() { }
   openFileDialogOnClick = true;
 
-  ngAfterViewInit(): void {
-    this.fieids = [];
-    this.editOption.openDocument = (a, v) => {
-      this.rich.openDocument(
-        a,
-        'documentName',
-        v as unknown as DocumentFormat
-      );
-
-      this.rich.focus();
-    }
+  /**
+   * 初始化模板加载
+   */
+  initRichEditDocument(v: OptionsEx) {
     const options = createOptions();
     options.ribbon.removeTab(RibbonTabType.Home);
     options.ribbon.removeTab(RibbonTabType.File);
@@ -89,15 +89,12 @@ export class EleEditComponent implements OnInit {
     options.events.pointerDown = () => { };
     options.events.pointerUp = () => { };
     options.events.saving = (s: RichEdit) => {
-
-      this.rich.document.fields.updateAllFields(() => { });
-
       s.exportToFile(t => {
         this.onSave.emit({
           file: t,
           fileIds: this.fieids
         });
-      }, DocumentFormat.OpenXml)
+      }, DocumentFormatEx.OpenXml)
     };
     options.events.saved = (s: RichEdit) => {
       this.onSaving.emit(s);
@@ -112,22 +109,59 @@ export class EleEditComponent implements OnInit {
     this.calculateDocumentVariable(options);
 
     let element = document.getElementById('RichEdit');
-    if (element !== null) this.rich = create(element, options);
+    if (element !== null)
+      this.rich = create(element, options);
+    else
+      return
+
     this.rich.openDocument(
-      this.editOption.documentContent,
+      v.documentContent,
       'documentName',
-      this.editOption.type as unknown as DocumentFormat
+      v.type as unknown as DocumentFormatEx
     );
+    this.fieids = [];
+    this.rich.document.fields.updateAllFields(() => { });
+
     this.rich.hasUnsavedChanges = true;
     this.rich.selection.goToNextWord(false)
     this.rich.focus();
-    this.dataSource.setData(this.editOption.elementList);
 
-    this.treeControl.expandAll();
+
+    if (v.elementList !== undefined && v.elementList !== null && v.elementList.length > 0) {
+      this.dataSource.setData(v.elementList);
+      this.treeControl.expandAll();
+    }
+
   }
   /**
-    * 文本替换方法
-    */
+   * 打开文档
+   * @param documentContent 文档内容
+   * @param type 文档格式
+   */
+  openDocument(documentContent: File | Blob | ArrayBuffer | string, type: DocumentFormat) {
+    this.rich.openDocument(
+      documentContent,
+      'documentName',
+      type as unknown as DocumentFormatEx
+    );
+    this.rich.focus();
+    this.rich.document.fields.updateAllFields(() => { });
+  }
+
+  ngOnInit() { }
+
+  constructor() { }
+
+  ngAfterViewInit(): void {
+    // if (this.editOption.elementList !== undefined && this.editOption.elementList !== null && this.editOption.elementList.length > 0) {
+    //   this.dataSource.setData(this.editOption.elementList);
+    //   this.treeControl.expandAll();
+    // }
+  }
+  /**
+   * 文本替换方法
+   * @param options rich配置 
+   */
   calculateDocumentVariable(options) {
     options.events.calculateDocumentVariable = (s, e) => {
       if (e.variableName !== "CustomProperty")
@@ -146,14 +180,12 @@ export class EleEditComponent implements OnInit {
         this.fieids.push(key);
     };
   }
-  fieids: string[] = [];
   ngOnDestroy() {
     if (this.rich) {
       this.rich.dispose();
       this.rich = null;
     }
   }
-  selectedIndex = 0;
 
   private transformer = (node: ElementItem, level: number): FlatNodeEx => (
     {
@@ -179,7 +211,6 @@ export class EleEditComponent implements OnInit {
 
   showLeafIcon = false;
 
-
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;
 
   getNode(name: string): FlatNode | null {
@@ -199,10 +230,12 @@ export class EleEditComponent implements OnInit {
   }
 
   beforeUpload = (file): boolean => {
-    this.rich.openDocument(file, "", DocumentFormat.OpenXml);
+    this.rich.openDocument(file, "", DocumentFormatEx.OpenXml);
     return false;
   };
-
+  /**
+   * 保存
+   */
   save() {
     this.rich.document.fields.updateAllFields(() => { });
     this.rich.exportToFile(t => {
@@ -210,11 +243,17 @@ export class EleEditComponent implements OnInit {
         file: t,
         fileIds: this.fieids
       });
-    }, DocumentFormat.OpenXml)
+    }, DocumentFormatEx.OpenXml)
   }
+  /**
+   * 打印
+   */
   print() {
     this.rich.printDocument(PrintMode.Html);
   }
+  /**
+   * 末尾添加签名
+   */
   addSignature() {
     this.rich.beginUpdate();
     //末尾行添加签名

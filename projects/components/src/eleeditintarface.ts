@@ -40,11 +40,6 @@ export interface OptionsEx {
    * 模板对应的患者病历字段
    * */
   richEditValueData?: EditValueItem[];
-
-  /**
-   * 替换编辑的文件 注意会丢失原本文件
-   */
-  openDocument?: ((documentContent: File | Blob | ArrayBuffer | string, type: DocumentFormat) => void);
 }
 export interface EditValueItem {
   /**
@@ -86,7 +81,9 @@ export interface PMItem {
    * */
   createtime: string;
 }
-
+/**
+ * 
+ */
 export interface FlatNodeEx extends FlatNode {
   id?: string;
 }
